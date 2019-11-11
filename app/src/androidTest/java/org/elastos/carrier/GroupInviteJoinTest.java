@@ -436,8 +436,10 @@ public class GroupInviteJoinTest {
 
 		TestOptions options = new TestOptions(context.getAppPath());
 		try {
-			Carrier.initializeInstance(options, handler);
-			carrier = Carrier.getInstance();
+//			Carrier.initializeInstance(options, handler);
+//			carrier = Carrier.getInstance();
+			Carrier carrier = new Carrier(handler);
+			carrier.initial(options);
 			carrier.start(0);
 			synchronized (carrier) {
 				carrier.wait();

@@ -78,8 +78,10 @@ public class ManagerTest {
 	public static void setUp() {
 		try {
 			TestOptions options = new TestOptions(context.getAppPath());
-			Carrier.initializeInstance(options, handler);
-			carrier = Carrier.getInstance();
+//			Carrier.initializeInstance(options, handler);
+//			carrier = Carrier.getInstance();
+			Carrier carrier = new Carrier(handler);
+			carrier.initial(options);
 			carrier.start(0);
 			synchronized (carrier) {
 				carrier.wait();
