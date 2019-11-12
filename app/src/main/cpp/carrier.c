@@ -33,16 +33,20 @@
 #include "carrierHandler.h"
 #include "carrierCookie.h"
 
-static HandlerContext handlerContext;
-
 static
 jboolean carrierInit(JNIEnv* env, jobject thiz, jobject joptions, jobject jcallbacks)
 {
     OptionsHelper helper;
     ElaCarrier *carrier;
-    HandlerContext *hc = &handlerContext;
+    HandlerContext *hc;
 
     memset(&helper, 0, sizeof(helper));
+
+    hc = malloc(sizeof(HandlerContext));
+    if (!hc) {
+        setErrorCode(ELA_GENERAL_ERROR(ELAERR_OUT_OF_MEMORY));
+        return JNI_FALSE;
+    }
     memset(hc, 0, sizeof(*hc));
 
     if (!getOptionsHelper(env, joptions, &helper)) {
@@ -97,7 +101,6 @@ jboolean carrierRun(JNIEnv* env, jobject thiz, jint jinterval)
         setErrorCode(ela_get_error());
         return JNI_FALSE;
     }
-    handlerCtxtCleanup(hc, env);
     logI("Native carrier node exited");
     return JNI_TRUE;
 }
@@ -109,8 +112,8 @@ void carrierKill(JNIEnv* env, jobject thiz)
     assert(hc->nativeCarrier);
 
     ela_kill(hc->nativeCarrier);
-    if (!hc->env)
-        handlerCtxtCleanup(hc, env);
+    handlerCtxtCleanup(hc, env);
+    free(hc);
 
     setLongField(env, thiz, "nativeCookie", 0);
 }

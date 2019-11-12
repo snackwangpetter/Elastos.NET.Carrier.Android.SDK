@@ -354,8 +354,16 @@ public class Carrier {
 
 	private static native int get_error_code();
 
-	public Carrier(CarrierHandler handler) {
+	public Carrier(Options options, CarrierHandler handler) throws CarrierException {
+		Callbacks callbacks = new Callbacks();
+
+
+		if (!native_init(options, callbacks))
+			throw CarrierException.fromErrorCode(get_error_code());
+
 		this.handler = handler;
+
+		Log.i(TAG, "Carrier node instance created");
 	}
 
 	/**
@@ -450,16 +458,6 @@ public class Carrier {
 //			carrier = tmp;
 //  		}
 //	}
-
-	public void initial(Options options) throws CarrierException {
-		if (options == null)
-			throw new IllegalArgumentException();
-
-		Callbacks callbacks = new Callbacks();
-
-		if (!native_init(options, callbacks))
-			throw CarrierException.fromErrorCode(get_error_code());
-	}
 
 	@Override
 	protected void finalize() throws Throwable {
